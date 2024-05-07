@@ -1,16 +1,11 @@
 % Define the directory to save HDF5 files
 output_directory = '/Users/blancamartin/Desktop/LFP_org_psychedelics/Extracted_Data/';
-raw_data_dir = '/Users/blancamartin/Desktop/LFP_org_psychedelics/2024-03-20_LFP_10min_no_stim_during_recording_was_stim_previously/118-5923/5MeOtreated-CheRiff-20032024-10minLFP(000)_BroadbandProcessor.raw';
+raw_data
 % Create the directory if it doesn't exist
 if ~isfolder(output_directory)
     mkdir(output_directory);
 end
-all_data = AxisFile(raw_data_dir).RawVoltageData;
-broadband = all_data(1,2);
-lfp_data = broadband.LoadData;
-sizes = size(lfp_data);
-lfp_rows = sizes(1);
-lfp_cols = sizes(2);
+lfp_data = AxisFile('')
 % Loop through each well
 for i = 1:lfp_rows
     for j = 1:lfp_cols
