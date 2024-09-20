@@ -89,10 +89,10 @@ def plot_one_pspectrum(sig, name = "", fs_ds = 100):
     plot_power_spectra([freq_mean[:]],[psd_mean[:]], [f'Welch {name}'])
 
 
-# In[5]:
+# In[22]:
 
 
-def plot_all_pspectra(ds_wells_data):
+def plot_all_pspectra(ds_wells_data, fs_ds = 100):
     '''
     plots all power spectra from a given data set (3D array of recordings for 6 by 8 well layout)
     plots all graphs, returns nothing
