@@ -19,7 +19,7 @@ altered to fit the 2 by 3 well array of plates A, B, C
 
 # ## Imports and function definitions
 
-# In[2]:
+# In[33]:
 
 
 #import matlab.engine 
@@ -30,6 +30,8 @@ import math
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import pandas as pd
+
 import pickle
 from tqdm import tqdm
 import IProgress
@@ -310,12 +312,12 @@ def spike_threshold_vis(spike_times_array, threshold = 20):
     plt.show()
 
 
-# In[11]:
+# In[23]:
 
 
 def find_and_plot_active_spike_windows(spike_times_array, window_size, threshold = 0):
     '''
-    takes in spike times array, window size, and a threshold
+    takes in spike times array, window size (s), and a threshold (num spikes)
     finds and plots the number of spikes for all windows of time per electrode with spike numbers above the threshold (default 0)
     sorts plots by most spikes to least spikes
     no return
@@ -380,10 +382,10 @@ def find_and_plot_active_spike_windows(spike_times_array, window_size, threshold
     plt.show()
 
 
-# In[12]:
+# In[24]:
 
 
-def spike_times_by_well(spike_times_array):
+def spikes_by_well(spike_times_array):
     '''
     consolidates MEA recordings into one array to create a spike time array by well
     usefull for matching organoid activity for lfp analysis
@@ -455,10 +457,10 @@ def plot_num_spikes_hist(spike_times_by_well, window_size, num_windows = 6, thre
 
 # Active window analysis for lfp:
 
-# In[14]:
+# In[27]:
 
 
-def fooof_wind_thresh(binary_activity, window_size, num_windows = 6, fs_ds = 100):
+def fooof_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 6, fs_ds = 100):
     '''
     creates and reports a fooof object on the data from the active window
     binary_activity: use returned value from plot_num_spikes_hist
@@ -484,10 +486,10 @@ def fooof_wind_thresh(binary_activity, window_size, num_windows = 6, fs_ds = 100
                     fm.report(freq_mean, psd_mean, freq_range)
 
 
-# In[15]:
+# In[26]:
 
 
-def ndsp_wind_thresh(binary_activity, window_size, num_windows = 6, fs_ds = 100):
+def ndsp_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 6, fs_ds = 100):
     '''
     same as fooof_wind_thresh but uses the neurodsp method plot_power_spectra instead of fooof
     '''
@@ -508,10 +510,10 @@ def ndsp_wind_thresh(binary_activity, window_size, num_windows = 6, fs_ds = 100)
 
 # Variation of FoooF parameters
 
-# In[16]:
+# In[28]:
 
 
-def set_fm_array(ds_wells_data):
+def set_fm_array(ds_wells_data, fs_ds = 100):
     '''
     creates an array of fooof objects based on given well data for parameter analysis by well
     returns the array of fooof objects
@@ -533,7 +535,7 @@ def set_fm_array(ds_wells_data):
     return fm_array
 
 
-# In[17]:
+# In[29]:
 
 
 def param_heatmap(fm_array):
@@ -548,8 +550,8 @@ def param_heatmap(fm_array):
     exponents = np.zeros((2, 3))
     r_squared_values = np.zeros((2, 3))
     
-    for i in range(6):
-        for j in range(8):
+    for i in range(2):
+        for j in range(3):
             offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
             knees[i, j] = fm_array[i, j].aperiodic_params_[1]
             exponents[i, j] = fm_array[i, j].aperiodic_params_[2]
@@ -585,7 +587,7 @@ dose_grid = np.array([
 ])
 
 
-# In[19]:
+# In[35]:
 
 
 def plot_variability(fm_array, dose_grid):
@@ -600,6 +602,10 @@ def plot_variability(fm_array, dose_grid):
         mask = dose_grid == dose
         return np.nanstd(param_array[mask])
         
+    offsets = np.zeros((2, 3))
+    knees = np.zeros((2, 3))
+    exponents = np.zeros((2, 3))   
+    r_squared_values = np.zeros((2, 3))
     for i in range(2):
         for j in range(3):
             offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
@@ -607,29 +613,18 @@ def plot_variability(fm_array, dose_grid):
             exponents[i, j] = fm_array[i, j].aperiodic_params_[2]
             r_squared_values[i, j] = fm_array[i, j].r_squared_
     
-    variability_10uM = {
-        'Aperiodic 1': calculate_variability(offsets, dose_grid, '10uM'),
+    variability_eGFP = {
+        'Aperiodic 1': calculate_variability(offsets, dose_grid, 'eGFP'),
         #'Aperiodic 2': calculate_variability(knees, dose_grid, '10uM'),
-        'Aperiodic 3': calculate_variability(exponents, dose_grid, '10uM'),
+        'Aperiodic 3': calculate_variability(exponents, dose_grid, 'eGFP'),
     }
     
-    variability_20uM = {
-        'Aperiodic 1': calculate_variability(offsets, dose_grid, '20uM'),
+    variability_CheRiff = {
+        'Aperiodic 1': calculate_variability(offsets, dose_grid, 'CheRiff'),
         #'Aperiodic 2': calculate_variability(knees, dose_grid, '20uM'),
-        'Aperiodic 3': calculate_variability(exponents, dose_grid, '20uM'),
+        'Aperiodic 3': calculate_variability(exponents, dose_grid, 'CheRiff'),
     }
-    
-    variability_vehicle = {
-        'Aperiodic 1': calculate_variability(offsets, dose_grid, 'Vehicle'),
-        #'Aperiodic 2': calculate_variability(knees, dose_grid, 'Vehicle'),
-        'Aperiodic 3': calculate_variability(exponents, dose_grid, 'Vehicle'),
-    }
-    
-    variability_empty = {
-        'Aperiodic 1': calculate_variability(offsets, dose_grid, 'Blank'),
-        #'Aperiodic 2': calculate_variability(knees, dose_grid, 'Blank'),
-        'Aperiodic 3': calculate_variability(exponents, dose_grid, 'Blank'),
-    }
+
     def variability(variability_dict, title):
         categories = list(variability_dict.keys())
         values = list(variability_dict.values())
@@ -640,13 +635,11 @@ def plot_variability(fm_array, dose_grid):
         plt.ylabel('Standard Deviation')
         plt.show()
 
-    variability(variability_10uM, 'Variability in 10uM Dose')
-    variability(variability_20uM, 'Variability in 20uM Dose')
-    variability(variability_vehicle, 'Variability in Vehicle (Control)')
-    variability(variability_empty, 'Variability in empty')
+    variability(variability_eGFP, 'Variability in eGFP')
+    variability(variability_CheRiff, 'Variability in CheRiff')
 
 
-# In[20]:
+# In[31]:
 
 
 def plot_aperiodic_boxplot(fm_array,  dose_grid):
@@ -658,6 +651,9 @@ def plot_aperiodic_boxplot(fm_array,  dose_grid):
     aperiodic_param_1_list = []
     aperiodic_param_2_list = []
     aperiodic_param_3_list = []
+    offsets = np.zeros((2, 3))
+    knees = np.zeros((2, 3))
+    exponents = np.zeros((2, 3))
     #extract aperiodic parameter arrays
     for i in range(2):
         for j in range(3):
