@@ -91,12 +91,12 @@ def plot_one_pspectrum(sig, name = "", fs_ds = 100):
     plot_power_spectra([freq_mean[:]],[psd_mean[:]], [f'Welch {name}'])
 
 
-# In[22]:
+# In[39]:
 
 
 def plot_all_pspectra(ds_wells_data, fs_ds = 100):
     '''
-    plots all power spectra from a given data set (3D array of recordings for 6 by 8 well layout)
+    plots all power spectra from a given data set (3D array of recordings for 2 by 3 well layout)
     plots all graphs, returns nothing
     '''
     fig, axes = plt.subplots(2, 3, figsize=(20, 15))
@@ -116,6 +116,25 @@ def plot_all_pspectra(ds_wells_data, fs_ds = 100):
     
     plt.tight_layout()
     plt.show()
+
+
+# In[38]:
+
+
+def fooof_all_pspectra(ds_wells_data, fs_ds = 100, fmode = "knee"):
+    '''
+    fits, reports, and plots all fooof power spectra from a given data set (3D array of recordings for 2 by 3 well layout)
+    plots all graphs, returns nothing
+    '''
+
+    for i in range(2):
+        for j in range(3):
+            sig = ds_wells_data[i][j]
+            freq_mean, psd_mean = compute_spectrum(sig, fs_ds, method='welch', avg_type='mean', nperseg=fs_ds*2)
+
+            fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = fmode)
+            freq_range = [1, 50]
+            fm.report(freq_mean, psd_mean, freq_range)
 
 
 # In[6]:
@@ -457,10 +476,10 @@ def plot_num_spikes_hist(spike_times_by_well, window_size, num_windows = 6, thre
 
 # Active window analysis for lfp:
 
-# In[27]:
+# In[37]:
 
 
-def fooof_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 6, fs_ds = 100):
+def fooof_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 6, fs_ds = 100, fmode = "knee"):
     '''
     creates and reports a fooof object on the data from the active window
     binary_activity: use returned value from plot_num_spikes_hist
@@ -481,7 +500,7 @@ def fooof_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows =
                     sig = ds_wells_data[row][col][start_time*fs_ds:end_time*fs_ds]              
                     freq_mean, psd_mean = compute_spectrum(sig, fs_ds, method='welch', avg_type='mean', nperseg=fs_ds*2)
             
-                    fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = "knee")
+                    fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = fmode)
                     freq_range = [1, 50]
                     fm.report(freq_mean, psd_mean, freq_range)
 
@@ -573,10 +592,10 @@ def param_heatmap(fm_array):
     plot_heatmap(r_squared_values, 'R-Squared Values', 'R^2')
 
 
-# In[18]:
+# In[36]:
 
 
-#Example dose grid for following functions:
+#Example dose grid for the following functions (define dose grid in running notebook for customized experiment):
 dose_grid = np.array([
     ['10uM', '10uM', '10uM', '20uM', '20uM', '20uM', 'Vehicle', 'Vehicle'],
     ['10uM', '10uM', '10uM', '20uM', '20uM', '20uM', 'Vehicle', 'Vehicle'],
