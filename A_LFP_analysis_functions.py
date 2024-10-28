@@ -90,7 +90,7 @@ def plot_one_pspectrum(sig, name = "", fs_ds = 100):
 # In[5]:
 
 
-def plot_all_pspectra(ds_wells_data, fs_ds = 100, n_rows = 6, n_cols = 8):
+def plot_all_pspectra(ds_wells_data, fs_ds = 100, n_rows = 2, n_cols = 3):
     '''
     plots all power spectra from a given data set (3D array of recordings for 6 by 8 well layout)
     plots all graphs, returns nothing
@@ -113,7 +113,7 @@ def plot_all_pspectra(ds_wells_data, fs_ds = 100, n_rows = 6, n_cols = 8):
     plt.tight_layout()
     plt.show()
 
-def fooof_all_pspectra(ds_wells_data, fs_ds = 100, fmode = "knee",n_rows = 6, n_cols = 8 ):
+def fooof_all_pspectra(ds_wells_data, fs_ds = 100, fmode = "knee",n_rows = 2, n_cols = 3 ):
     '''
     fits, reports, and plots all fooof power spectra from a given data set (3D array of recordings for 2 by 3 well layout)
     plots all graphs, returns nothing
@@ -147,7 +147,7 @@ def ds_power_windows(sig, inc, name = "", fs_ds = 100):
 # In[7]:
 
 
-def fooof_on_windows(sig, inc, name = "", fs_ds = 100, fmode = "knee"):
+def fooof_on_windows(sig, inc, name = "", fs_ds = 100):
     '''
     similar to ds_power_windows but runs fooof on windowed recording and prints a report
     min peak height set from 'ds_lfp_07-29-24' from peak of noise data
@@ -158,7 +158,7 @@ def fooof_on_windows(sig, inc, name = "", fs_ds = 100, fmode = "knee"):
         curr += inc
         freq_mean, psd_mean = compute_spectrum(wndw, fs_ds, method='welch', avg_type='mean', nperseg=fs_ds*2)
 
-        fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = fmode)
+        fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = "knee")
         freq_range = [1, 50]
         fm.report(freq_mean, psd_mean, freq_range)
 
@@ -198,7 +198,7 @@ def load_spikes(mat_file_path):
 # In[9]:
 
 
-def spike_spacial_visualization(spike_times_array, n_rows = 6, n_cols = 8):
+def spike_spacial_visualization(spike_times_array, n_rows = 2, n_cols = 3):
     '''
     created a heatmap per well of spikes in the recording along with a blended heatmap of spikes per electrode
     returns nothing, plots graphs
@@ -288,7 +288,7 @@ def spike_spacial_visualization(spike_times_array, n_rows = 6, n_cols = 8):
 # In[10]:
 
 
-def spike_threshold_vis(spike_times_array, threshold = 20, n_rows = 6, n_cols = 8):
+def spike_threshold_vis(spike_times_array, threshold = 20, n_rows = 2, n_cols = 3):
     '''
     similar to spike_spacial_visualization(spike_times_array) but colors dark green for electrodes over threshold and light for electrodes under
     '''
@@ -328,7 +328,7 @@ def spike_threshold_vis(spike_times_array, threshold = 20, n_rows = 6, n_cols = 
 # In[11]:
 
 
-def find_and_plot_active_spike_windows(spike_times_array, window_size, threshold = 0, n_rows = 6, n_cols = 8):
+def find_and_plot_active_spike_windows(spike_times_array, window_size, threshold = 0, n_rows = 2, n_cols = 3):
     '''
     takes in spike times array, window size, and a threshold
     finds and plots the number of spikes for all windows of time per electrode with spike numbers above the threshold (default 0)
@@ -400,7 +400,7 @@ def find_and_plot_active_spike_windows(spike_times_array, window_size, threshold
 # In[12]:
 
 
-def spikes_by_well(spike_times_array, n_rows = 6, n_cols = 8):
+def spikes_by_well(spike_times_array, n_rows = 2, n_cols = 3):
     '''
     consolidates MEA recordings into one array to create a spike time array by well
     usefull for matching organoid activity for lfp analysis
@@ -434,7 +434,7 @@ def spikes_by_well(spike_times_array, n_rows = 6, n_cols = 8):
 # In[13]:
 
 
-def plot_num_spikes_hist(spike_times_by_well, window_size, num_windows = 6, threshold = 500, n_rows = 6, n_cols = 8):
+def plot_num_spikes_hist(spike_times_by_well, window_size, num_windows = 6, threshold = 500, n_rows = 2, n_cols = 2):
     '''
     plots a histogram of number of windows with a range of spikes starting at the given threshold
     uses spike times by well for use in relation to lfp analysis
@@ -477,7 +477,7 @@ def plot_num_spikes_hist(spike_times_by_well, window_size, num_windows = 6, thre
 # In[14]:
 
 
-def fooof_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 6, fs_ds = 100, fmode = "knee", n_rows = 6, n_cols = 8):
+def fooof_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 6, fs_ds = 100, fmode = "knee", n_rows = 2, n_cols = 3):
     '''
     creates and reports a fooof object on the data from the active window
     binary_activity: use returned value from plot_num_spikes_hist
@@ -506,7 +506,7 @@ def fooof_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows =
 # In[17]:
 
 
-def ndsp_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 6, fs_ds = 100, n_rows = 6, n_cols = 8):
+def ndsp_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 6, fs_ds = 100, n_rows = 2, n_cols = 3):
     '''
     same as fooof_wind_thresh but uses the neurodsp method plot_power_spectra instead of fooof
     '''
@@ -530,7 +530,7 @@ def ndsp_wind_thresh(binary_activity, ds_wells_data, window_size, num_windows = 
 # In[18]:
 
 
-def set_fm_array(ds_wells_data, fs_ds = 100, fmode = "knee", n_rows = 6, n_cols = 8):
+def set_fm_array(ds_wells_data, fs_ds = 100, n_rows = 2, n_cols = 3):
     '''
     creates an array of fooof objects based on given well data for parameter analysis by well
     returns the array of fooof objects
@@ -541,7 +541,7 @@ def set_fm_array(ds_wells_data, fs_ds = 100, fmode = "knee", n_rows = 6, n_cols 
             sig = ds_wells_data[i][j]
             freq_mean, psd_mean = compute_spectrum(sig, fs_ds, method='welch', avg_type='mean', nperseg=fs_ds*2)
             # Initialize a FOOOF object
-            fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = fmode, verbose=False)
+            fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = "knee", verbose=False)
             fm_array[i, j] = fm
             # Set the frequency range to fit the model
             freq_range = [2, 50]
@@ -551,7 +551,7 @@ def set_fm_array(ds_wells_data, fs_ds = 100, fmode = "knee", n_rows = 6, n_cols 
 
     return fm_array
 
-def set_fm_array_one_outlier(ds_wells_data, fs_ds = 100, fmode = "knee", n_rows = 6, n_cols = 8, indices = [-1, -1]):
+def set_fm_array_one_outlier(ds_wells_data, fs_ds = 100, n_rows = 2, n_cols = 3, indices = [-1, -1]):
     '''
     creates an array of fooof objects based on given well data for parameter analysis by well
     returns the array of fooof objects
@@ -564,7 +564,7 @@ def set_fm_array_one_outlier(ds_wells_data, fs_ds = 100, fmode = "knee", n_rows 
             sig = ds_wells_data[i][j]
             freq_mean, psd_mean = compute_spectrum(sig, fs_ds, method='welch', avg_type='mean', nperseg=fs_ds*2)
             # Initialize a FOOOF object
-            fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = fmode, verbose=False)
+            fm = FOOOF(min_peak_height=0.5316, aperiodic_mode = "knee", verbose=False)
             fm_array[i, j] = fm
             # Set the frequency range to fit the model
             freq_range = [2, 50]
@@ -577,7 +577,7 @@ def set_fm_array_one_outlier(ds_wells_data, fs_ds = 100, fmode = "knee", n_rows 
 # In[19]:
 
 
-def param_heatmap(fm_array, n_rows = 6, n_cols = 8):
+def param_heatmap(fm_array, n_rows = 2, n_cols = 3):
     '''
     uses a heatmap to plot each parameter in a spacial distribution view
     takes in fm_array (array of fooof objects)
@@ -629,7 +629,7 @@ dose_grid = np.array([
 # In[22]:
 
 
-def plot_variability(fm_array, dose_grid, n_rows = 6, n_cols = 8):
+def plot_variability(fm_array, dose_grid, n_rows = 2, n_cols = 3):
     '''
     plots the standard deviation of the aperiodic paramters from given fm_array
     doesn't plot knees for scale issues
@@ -705,7 +705,7 @@ def plot_variability(fm_array, dose_grid, n_rows = 6, n_cols = 8):
 # In[23]:
 
 
-def plot_aperiodic_boxplot(fm_array,  dose_grid, fmode = "knee", n_rows = 6, n_cols = 8):
+def plot_aperiodic_boxplot(fm_array,  dose_grid, n_rows = 2, n_cols = 3):
     '''
     plots boxplots based on the aperiodic parameter lists extracted from fm_array and uses dose_grid for plotting 
     returns nothing, plots graphs
@@ -721,13 +721,9 @@ def plot_aperiodic_boxplot(fm_array,  dose_grid, fmode = "knee", n_rows = 6, n_c
     #extract aperiodic parameter arrays
     for i in range(n_rows):
         for j in range(n_cols):
-            if(fmode == "knee"):
-                offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
-                knees[i, j] = fm_array[i, j].aperiodic_params_[1]
-                exponents[i, j] = fm_array[i, j].aperiodic_params_[2]
-            else:
-                offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
-                exponents[i, j] = fm_array[i, j].aperiodic_params_[1]
+            offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
+            knees[i, j] = fm_array[i, j].aperiodic_params_[1]
+            exponents[i, j] = fm_array[i, j].aperiodic_params_[2]
     
     # Loop through each well and collect data
     for i in range(n_rows):
@@ -735,48 +731,30 @@ def plot_aperiodic_boxplot(fm_array,  dose_grid, fmode = "knee", n_rows = 6, n_c
             dose = dose_grid[i, j]
             #if dose in grouped_params:
                 # Ensure that aperiodic parameters are not None or empty
-            if(fmode == "knee"):
-                if offsets[i, j] is not None and knees[i, j] is not None and exponents[i, j] is not None:
-                    dose_labels.append(dose)
-                    aperiodic_param_1_list.append(offsets[i, j])
-                    aperiodic_param_2_list.append(knees[i, j])
-                    aperiodic_param_3_list.append(exponents[i, j])
-            else:
-                    dose_labels.append(dose)
-                    aperiodic_param_1_list.append(offsets[i, j])
-                    aperiodic_param_2_list.append(exponents[i, j])
-        
-    if(fmode == "knee"):
-        # Create a DataFrame
-        df = pd.DataFrame({
-            'Dose': dose_labels,
-            'Offsets': aperiodic_param_1_list,
-            'Knees': aperiodic_param_2_list,
-            'Exponents': aperiodic_param_3_list
-        })
-    else:
-        df = pd.DataFrame({
-            'Dose': dose_labels,
-            'Offsets': aperiodic_param_1_list,
-            'Exponents': aperiodic_param_2_list
-        })
+            if offsets[i, j] is not None and knees[i, j] is not None and exponents[i, j] is not None:
+                dose_labels.append(dose)
+                aperiodic_param_1_list.append(offsets[i, j])
+                aperiodic_param_2_list.append(knees[i, j])
+                aperiodic_param_3_list.append(exponents[i, j])
+    
+    # Create a DataFrame
+    df = pd.DataFrame({
+        'Dose': dose_labels,
+        'Offsets': aperiodic_param_1_list,
+        'Knees': aperiodic_param_2_list,
+        'Exponents': aperiodic_param_3_list
+    })
     
     # Plotting boxplots for each aperiodic parameter
     plt.figure(figsize=(14, 10))
-    if(fmode == "knee"):
-        for idx, param in enumerate(['Offsets', 'Knees', 'Exponents'], 1):
-            plt.subplot(1, 3, idx)
-            sns.boxplot(x='Dose', y=param, data=df)
-            plt.title(f'{param} by Dose')
-            plt.xlabel('Dose')
-            plt.ylabel(param)
-    else:
-        for idx, param in enumerate(['Offsets', 'Exponents'], 1):
-            plt.subplot(1, 3, idx)
-            sns.boxplot(x='Dose', y=param, data=df)
-            plt.title(f'{param} by Dose')
-            plt.xlabel('Dose')
-            plt.ylabel(param)
+    
+    for idx, param in enumerate(['Offsets', 'Knees', 'Exponents'], 1):
+        plt.subplot(1, 3, idx)
+        sns.boxplot(x='Dose', y=param, data=df)
+        plt.title(f'{param} by Dose')
+        plt.xlabel('Dose')
+        plt.ylabel(param)
+    
     plt.tight_layout()
     plt.show()
 
@@ -784,7 +762,7 @@ def plot_aperiodic_boxplot(fm_array,  dose_grid, fmode = "knee", n_rows = 6, n_c
 # In[24]:
 
 
-def plot_peak_boxplot(fm_array, n_rows = 6, n_cols = 8):
+def plot_peak_boxplot(fm_array, n_rows = 2, n_cols = 3):
     '''
     plots boxplots based on the peak parameter lists extracted from fm_array
     returns nothing, plots graphs
@@ -829,7 +807,7 @@ def plot_peak_boxplot(fm_array, n_rows = 6, n_cols = 8):
 
 
 
-def plot_peak_binary_heatmap(fm_array, n_rows = 6, n_cols = 8):
+def plot_peak_binary_heatmap(fm_array, n_rows = 2, n_cols = 3):
     '''
     Creates a binary 2D array indicating if a well has peaks, and plots a heatmap.
     Takes in fm_array (array of FOOOF objects).
@@ -853,7 +831,8 @@ def plot_peak_binary_heatmap(fm_array, n_rows = 6, n_cols = 8):
 
 # In[ ]:
 
-def plot_peak_boxplot2(fm_array, dose_grid, n_rows = 6, n_cols = 8):
+
+def plot_peak_boxplot2(fm_array, dose_grid, n_rows = 2, n_cols = 3):
     '''
     Plots boxplots for the peak parameters (n_peaks, peak_params) based on dose groups from dose_grid.
     '''
@@ -919,7 +898,6 @@ def plot_peak_boxplot2(fm_array, dose_grid, n_rows = 6, n_cols = 8):
 
     plt.tight_layout()
     plt.show()
-
 
 
 
