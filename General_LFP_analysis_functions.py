@@ -577,7 +577,7 @@ def set_fm_array_one_outlier(ds_wells_data, fs_ds = 100, fmode = "knee", n_rows 
 # In[19]:
 
 
-def param_heatmap(fm_array, n_rows = 6, n_cols = 8):
+def param_heatmap(fm_array, fmode = "knee",  n_rows = 6, n_cols = 8):
     '''
     uses a heatmap to plot each parameter in a spacial distribution view
     takes in fm_array (array of fooof objects)
@@ -591,11 +591,16 @@ def param_heatmap(fm_array, n_rows = 6, n_cols = 8):
     
     for i in range(n_rows):
         for j in range(n_cols):
-            offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
-            knees[i, j] = fm_array[i, j].aperiodic_params_[1]
-            exponents[i, j] = fm_array[i, j].aperiodic_params_[2]
-            r_squared_values[i, j] = fm_array[i, j].r_squared_
-    
+            if fmode == "knee":
+                offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
+                knees[i, j] = fm_array[i, j].aperiodic_params_[1]
+                exponents[i, j] = fm_array[i, j].aperiodic_params_[2]
+                r_squared_values[i, j] = fm_array[i, j].r_squared_
+            else:
+                offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
+                exponents[i, j] = fm_array[i, j].aperiodic_params_[1]
+                r_squared_values[i, j] = fm_array[i, j].r_squared_
+        
     # Create a function to plot heatmaps
     def plot_heatmap(data, title, cbar_label):
         plt.figure(figsize=(10, 8))
@@ -607,7 +612,8 @@ def param_heatmap(fm_array, n_rows = 6, n_cols = 8):
     
     # Plot each heatmap
     plot_heatmap(offsets, 'Aperiodic Offsets', 'Value')
-    plot_heatmap(knees, 'Aperiodic Knees', 'Value')
+    if fmode == "knee":
+        plot_heatmap(knees, 'Aperiodic Knees', 'Value')
     plot_heatmap(exponents, 'Aperiodic Exponents', 'Value')
     plot_heatmap(r_squared_values, 'R-Squared Values', 'R^2')
 
@@ -629,7 +635,7 @@ dose_grid = np.array([
 # In[22]:
 
 
-def plot_variability(fm_array, dose_grid, n_rows = 6, n_cols = 8):
+def plot_variability(fm_array, dose_grid, n_rows = 6, n_cols = 8, fmode = "knee"):
     '''
     plots the standard deviation of the aperiodic paramters from given fm_array
     doesn't plot knees for scale issues
@@ -647,11 +653,16 @@ def plot_variability(fm_array, dose_grid, n_rows = 6, n_cols = 8):
         
     for i in range(n_rows):
         for j in range(n_cols):
-            offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
-            knees[i, j] = fm_array[i, j].aperiodic_params_[1]
-            exponents[i, j] = fm_array[i, j].aperiodic_params_[2]
-            r_squared_values[i, j] = fm_array[i, j].r_squared_
-    
+            if fmode == "knee":
+                offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
+                knees[i, j] = fm_array[i, j].aperiodic_params_[1]
+                exponents[i, j] = fm_array[i, j].aperiodic_params_[2]
+                r_squared_values[i, j] = fm_array[i, j].r_squared_
+            else:
+                offsets[i, j] = fm_array[i, j].aperiodic_params_[0]
+                exponents[i, j] = fm_array[i, j].aperiodic_params_[1]
+                r_squared_values[i, j] = fm_array[i, j].r_squared_
+        
     '''    variability_10uM = {
         'Aperiodic 1': calculate_variability(offsets, dose_grid, '10uM'),
         #'Aperiodic 2': calculate_variability(knees, dose_grid, '10uM'),
