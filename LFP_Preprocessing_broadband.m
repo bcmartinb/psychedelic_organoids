@@ -1,27 +1,32 @@
 % Define the directory to save HDF5 files
-output_directory = "C:\Users\david\Documents\Voytek Research\LFP_psych_proj\broadband_squared_dataset";
-raw_data_dir = "D:\2024-08-01 broadband test for blanca\broadband processor\118-5923\BIPOLES_GR_20240801_alternate orange and blue(000)_BroadbandProcessor.raw";
+output_directory = "C:\Users\david\Documents\Voytek Research\LFP_psych_proj\PlateAngela\Feb28-25"
+raw_data_dir = "C:\Users\david\Documents\Voytek Research\LFP_psych_proj\PlateAngela\Feb28-25\Angela1_20250228_LFP_10min(000)_BroadbandProcessor.raw";
+
 % Create the directory if it doesn't exist
 if ~isfolder(output_directory)
     mkdir(output_directory);
 end
+
+% Load the raw voltage data
 all_data = AxisFile(raw_data_dir).RawVoltageData;
-broadband = all_data(1,2);
+broadband = all_data(1, 2); %downsampled (lfp)
 disp(broadband)
 lfp_data = broadband.LoadData;
+
+% Get the size of the LFP data
 sizes = size(lfp_data);
 lfp_rows = sizes(1);
 lfp_cols = sizes(2);
 
-% Initialize a cell array to store data for each well
-all_wells_data = cell(lfp_rows, lfp_cols);
+% Initialize a 3D array to store data for all wells
+time_points = length(lfp_data{1, 1}.Data);  % Assuming the time dimension is the same across all wells
+combined_data = zeros(lfp_rows, lfp_cols, time_points);
 
 % Loop through each well
 for i = 1:lfp_rows
     for j = 1:lfp_cols
         % Extract the data for the current well
         current_well_data = lfp_data(i, j);
-        current_well_data = current_well_data{1,1}.Data;
         
         % Check if the current_well_data is empty
         if isempty(current_well_data)
@@ -29,40 +34,28 @@ for i = 1:lfp_rows
             continue;
         end
         
-        % Ensure current_well_data is numeric
-        numeric_data = double(current_well_data);
-        
-        % Store the numeric_data in the cell array
-        all_wells_data{i, j} = numeric_data;
-        
-        % Plot the electrode data
-        figure;
-        plot(numeric_data);
-        title(sprintf('Well %s%d Electrode Data', char('A' + i - 1), j));
-        xlabel('Time');
-        ylabel('Voltage');
+        % Extract the electrode data
+        numeric_data = double(current_well_data{1, 1}.Data);  % Assuming you want to use the first electrode
+        combined_data(i, j, :) = numeric_data;  % Store it in the 3D array
+
+        %plot each
+        %figure;
+        %plot(numeric_data);
+        %title(sprintf('Recording from Well %s%d', char('A' + i - 1), j));
+        %xlabel('Time (samples)');
+        %ylabel('Voltage (µV)');
+        %grid on; % Add grid lines
     end
 end
 
-% Convert the cell array to a numeric array if possible, otherwise save as a cell
-try
-    all_wells_data_numeric = cell2mat(all_wells_data);
-    save_data = all_wells_data_numeric;
-    datatype = 'double';
-catch
-    save_data = all_wells_data;
-    datatype = 'cell';
-end
 
-% Save the combined data to a single HDF5 file
-filename = fullfile(output_directory, 'combined_lfp_data.h5');
+% Save the 3D array to a single HDF5 file
+filename = fullfile(output_directory, 'lfp_data.h5');
 if exist(filename, 'file')
     delete(filename); % Delete the existing file to avoid conflicts
 end
 
-if strcmp(datatype, 'double')
-    h5create(filename, '/all_wells_data', size(save_data), 'Datatype', 'double');
-else
-    h5create(filename, '/all_wells_data', size(save_data), 'Datatype', 'cell');
-end
-h5write(filename, '/all_wells_data', save_data);
+h5create(filename, '/all_wells_data', size(combined_data), 'Datatype', 'double');
+h5write(filename, '/all_wells_data', combined_data);
+
+disp('Data saved successfully.');
